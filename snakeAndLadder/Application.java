@@ -7,8 +7,8 @@ import snakeAndLadder.util.InputReader;
 public class Application {
 
     public static void main(String[] args) {
-        GameConfig gameConfig = InputReader.readConfig();
-        GameEngine.startGame(gameConfig);
+        GameConfig gameConfig = InputReader.readRandomSnakeAndLaddersConfig();
+        new GameEngine(gameConfig).startGame();
     }
 
 }

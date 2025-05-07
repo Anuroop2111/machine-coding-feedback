@@ -2,10 +2,10 @@ package snakeAndLadder.models;
 
 public class Player {
 
-    public String name;
-    public Integer pos = 0;
+    public final String name;
+    public int pos = 0;
     public Boolean hasWon = Boolean.FALSE;
-    public Integer rank = 0; // Player Rank
+    public int rank = 0; // Player Rank
 
     public Player(String name) {
         this.name = name;
@@ -13,12 +13,12 @@ public class Player {
 
     // Getters
     public String getName() {return name;}
-    public Integer getPos() {return pos;}
+    public int getPos() {return pos;}
     public Boolean getHasWon() {return hasWon;}
-    public Integer getRank() {return rank;}
+    public int getRank() {return rank;}
 
     // Setters
-    public void setPos(Integer pos) {this.pos = pos;}
+    public void setPos(int pos) {this.pos = pos;}
     public void setHasWon(Boolean hasWon) {this.hasWon = hasWon;}
-    public void setRank(Integer rank) {this.rank = rank;}
+    public void setRank(int rank) {this.rank = rank;}
 }

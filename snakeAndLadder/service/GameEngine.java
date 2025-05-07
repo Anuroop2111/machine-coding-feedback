@@ -3,56 +3,49 @@ package snakeAndLadder.service;
 import snakeAndLadder.models.Board;
 import snakeAndLadder.models.GameConfig;
 import snakeAndLadder.models.Player;
-import snakeAndLadder.util.RandomGenerator;
+import snakeAndLadder.util.RollDice;
 
-import java.util.List;
-import java.util.Map;
+import java.util.ArrayDeque;
 import java.util.Objects;
 
 public class GameEngine {
 
-    public static void startGame(GameConfig gameConfig) {
-        List<Player> players = gameConfig.getPlayers();
+    private final GameConfig gameConfig;
+
+    public GameEngine(GameConfig gameConfig) {
+        this.gameConfig = gameConfig;
+    }
+
+    public void startGame() {
+        ArrayDeque<Player> players = new ArrayDeque<>(gameConfig.getPlayers());
+        int nextRank = 1;
         Board board = gameConfig.getBoard();
 
-        Integer maxCellValue = board.getTotalCells();
-        while(! gameConfig.isGameOver()) {
-            for (Player player : players) {
-                Integer initPos = player.getPos();
-                Integer maxDiceValue = board.getMaxDiceValue();
-                Integer diceValue = RandomGenerator.generate(maxDiceValue);
-                Integer finalPos = getFinalPos(initPos, diceValue, maxCellValue, board);
-                player.setPos(finalPos);
-                System.out.printf("%s rolled a %s and moved from %s to %s %n", player.getName(), diceValue, initPos, finalPos);
+        int maxCellValue = board.getTotalCells();
+        while (players.size() > 1) {
+            Player player = players.poll();
+            int initPos = player.getPos();
+            Integer diceValue = RollDice.roll(Board.diceCount, Board.maxConsecutiveSix);
+            Integer finalPos = board.move(initPos, diceValue);
+            player.setPos(finalPos);
+            System.out.printf("%s rolled a %s and moved from %s to %s %n", player.getName(), diceValue, initPos, finalPos);
 
-                // Check if the player won
-                if (Objects.equals(finalPos, maxCellValue)) {
-                    System.out.printf("%s wins the game %n", player.getName());
-                    player.setHasWon(Boolean.TRUE);
-                    player.setRank(gameConfig.getCurrentRank() + 1);
-                    gameConfig.setIsGameOver(Boolean.TRUE);
-                    break;
-                }
+            // Check if the player won
+            if (hasPlayerWon(player, maxCellValue)) {
+                player.setHasWon(Boolean.TRUE);
+                player.setRank(nextRank);
+                System.out.printf("%s wins the game at rank %s %n", player.getName(), player.getRank());
+                nextRank += 1;
+            } else {
+                players.offer(player);
             }
         }
 
+        Player lastPlayer = players.poll();
+        lastPlayer.setRank(nextRank);
     }
 
-    private static Integer getFinalPos(Integer initPos, Integer diceValue, Integer maxCellValue, Board board) {
-        Map<Integer, Integer> snakeMapper = board.getSnakeMapper();
-        Map<Integer, Integer> ladderMapper = board.getLadderMapper();
-
-        // Check if finalPos exceeds maxCellValue
-        Integer finalPos = initPos + diceValue;
-        if (finalPos > maxCellValue) {return initPos;}
-
-        // Check if dice landed on a snake head or ladder tail
-        if (snakeMapper.containsKey(finalPos)) {
-            finalPos = snakeMapper.get(finalPos);
-        } else if (ladderMapper.containsKey(finalPos)) {
-            finalPos = ladderMapper.get(finalPos);
-        }
-
-        return finalPos;
+    private boolean hasPlayerWon(Player player, Integer maxCellValue) {
+        return Objects.equals(player.getPos(), maxCellValue);
     }
 }

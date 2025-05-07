@@ -19,6 +19,8 @@ public class InputReader {
     public static GameConfig readConfig() {
         Scanner sc = new Scanner(System.in);
 
+        int boardSize = sc.nextInt();
+
         int numSnakes = sc.nextInt();
         Map<Integer, Integer> snakeMapper = new HashMap<>();
         for (int i = 0; i < numSnakes; i++) {
@@ -43,7 +45,28 @@ public class InputReader {
             players.add(player);
         }
 
-        Board board = new Board(100, snakeMapper, ladderMapper);
+        Board board = new Board(boardSize, snakeMapper, ladderMapper);
+        sc.close();
+
+        return new GameConfig(board, players);
+    }
+
+    public static GameConfig readRandomSnakeAndLaddersConfig() {
+        Scanner sc = new Scanner(System.in);
+
+        int boardSize = sc.nextInt();
+        int numSnakes = sc.nextInt();
+        int numLadder = sc.nextInt();
+        int numPlayers = sc.nextInt();
+
+        List<Player> players = new ArrayList<>();
+        for (int i = 0; i < numPlayers; i++) {
+            String name = sc.next();
+            Player player = new Player(name);
+            players.add(player);
+        }
+
+        Board board = Board.createRandomBoard(boardSize, numSnakes, numLadder);
         sc.close();
 
         return new GameConfig(board, players);
