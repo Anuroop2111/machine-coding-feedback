@@ -73,5 +73,4 @@ public class Board {
 
         return finalPos;
     }
-
 }
